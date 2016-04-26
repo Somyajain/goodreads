@@ -21,34 +21,54 @@ class Goodreads():
     def books(self):
         #function for top 10
         url=requests.get('https://www.goodreads.com/author/list/'+self.author_id+'?page=1&per_page=10')
-        soup=bs(url.content)
-        ten_books=soup.find_all('div',{'class':'bookTitle'})
-        list_of_tenbooks=[]
-        for e in ten_books:
-            pos=e.find('-')
-            list_of_tenbooks.append(e[:pos])
-        print 'Top 10 books :',list_of_tenbooks
+        soup=bs(url.content,'lxml')
+	ten_books=soup.find_all('a',{'class':'bookTitle'})
+	list_of_tenbooks=[]
+	for e in ten_books:
+		list_of_tenbooks.append(e.get_text().encode('utf-8'))
+	print list_of_tenbooks
+
+	print 'Top 10 books :'
+	for m in list_of_tenbooks:
+		print m
+		print '\n'
 
     def all_books(self):
         #function for top 10
         url=requests.get('https://www.goodreads.com/author/list/'+self.author_id+'?page=1&per_page=1000')
-        soup=bs(url.content)
-        all_books=soup.find_all('div',{'class':'bookTitle'})
+        soup=bs(url.content,'lxml')
+        all_books=soup.find_all('a',{'class':'bookTitle'})
         list_of_books=[]
+
         for e in all_books:
-            pos=e.find('-')
-            list_of_books.append(e[:pos])
-        print 'All books:',list_of_books
+
+
+		list_of_books.append((e.get_text()).encode('utf-8'))
+
+	print list_of_books[0]
+	print len(list_of_books)
 
     def quotes(self):
         url=requests.get('http://www.goodreads.com/author/quotes/'+ self.author_id+'?page=1&per_page=1000')
-        soup=bs(url.content)
+        soup=bs(url.content,'lxml')
         all_quotes=soup.find_all('div',{'class':'quoteText'})
-        list_of_quotes=[]
-        for e in all_quotes:
-            pos=e.find('-')
-            list_of_quotes.append(e[:pos])
-        print 'All quotes',list_of_quotes
-
-    def read_quotes(self,n):
-        fo=open('quotes.txt','wb+')
+	self.list_of_quotes=[]
+	for e in all_quotes:
+		self.list_of_quotes.append(e.get_text().encode('utf-8'))
+	print self.list_of_quotes[1]
+	print len(self.list_of_quotes)
+    
+    def write_quotes(self,n):
+	self.quotes()
+	print n	
+	string=''
+	print self.author
+	count=0
+	while count<n:
+		string=string+self.list_of_quotes[count]+'\n'
+		print 'here', n
+		count+=1
+	fo=open('quotes'+ str(self.author)+'.txt','wb+')
+	fo.write(string)
+	fo.close()
+        
